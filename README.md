@@ -2,7 +2,8 @@
 
 [![Build Status](https://travis-ci.org/devops-works/influxevent.svg?branch=master)](https://travis-ci.org/devops-works/influxevent)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devops-works/influxevent)](https://goreportcard.com/report/github.com/devops-works/influxevent)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=influxevent&metric=coverage)](https://sonarcloud.io/dashboard?id=influxevent)
+[![Maintainability](https://api.codeclimate.com/v1/badges/c4371a3fb883f200ccef/maintainability)](https://codeclimate.com/github/devops-works/influxevent/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/c4371a3fb883f200ccef/test_coverage)](https://codeclimate.com/github/devops-works/influxevent/test_coverage)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 **this is beta stuff**
