@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"strconv"
 	"syscall"
 	"time"
 )
@@ -119,7 +120,7 @@ func (p point) String() string {
 	if p.tags != "" {
 		influxString = fmt.Sprintf("%s,%s", influxString, p.tags)
 	}
-	influxString = fmt.Sprintf("%s duration=%f,status=%d", influxString, p.duration, p.status)
+	influxString = fmt.Sprintf("%s duration=%s,status=%d", influxString, strconv.FormatFloat(p.duration, 'f', -1, 64), p.status)
 	return influxString
 }
 
@@ -144,7 +145,7 @@ func logInfluxDB(server influx, point point) error {
 	}
 
 	if resp.StatusCode != 204 {
-		return fmt.Errorf("unable to write to influxdb server %s, got reponse: %s", server.url, resp.Status)
+		return fmt.Errorf("unable to write to influxdb server %s, got response: %s", server.url, resp.Status)
 	}
 	return nil
 }

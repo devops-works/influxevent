@@ -1,0 +1,28 @@
+sudo: false
+dist: trusty
+
+language: go
+
+# Force-enable Go modules. This will be unnecessary when Go 1.12 lands.
+env:
+  - GO111MODULE=on
+
+go:
+  - 1.12.x
+
+addons:
+  sonarcloud:
+    organization: "devopsworks"
+
+install: true
+
+# Don't email me the results of the test runs.
+notifications:
+  email: false
+
+script:
+  # - golangci-lint run       # run a bunch of code checkers/linters in parallel
+  - go test -coverprofile=coverage.out -v -race ./...  # Run all the tests with the race detector enabled
+  - make build
+  - sonar-scanner
+
