@@ -22,7 +22,9 @@ all: fmt lint $(BIN) ; $(info $(M) building executable…) @ ## Build program bi
 		-ldflags '-X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' \
 		-o $(BIN)/$(PACKAGE)
 
-static: fmt lint $(BIN) ; $(info $(M) building static executable for Linux……) @ ## Build program binary
+build: linux
+
+linux: fmt lint $(BIN) ; $(info $(M) building static executable for Linux……) @ ## Build program binary
 	$Q env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build \
 		-tags release \
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
