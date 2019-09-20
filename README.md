@@ -2,7 +2,6 @@
 
 [![Build Status](https://travis-ci.org/devops-works/influxevent.svg?branch=master)](https://travis-ci.org/devops-works/influxevent)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devops-works/influxevent)](https://goreportcard.com/report/github.com/devops-works/influxevent)
-[![SonarQube](https://sonarcloud.io/api/project_badges/measure?project=influxevent&metric=alert_status)](https://sonarcloud.io/dashboard?id=influxevent)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=influxevent&metric=coverage)](https://sonarcloud.io/dashboard?id=influxevent)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
