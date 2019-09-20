@@ -26,7 +26,7 @@ static: fmt lint $(BIN) ; $(info $(M) building static executable for Linux……
 	$Q env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build \
 		-tags release \
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
-		-o $(BIN)/$(PACKAGE)-$(VERSION)
+		-o $(BIN)/$(PACKAGE)-linux-$(VERSION)
 	$Q gzip $(BIN)/$(PACKAGE)-linux-$(VERSION)
 
 darwin: fmt lint $(BIN) ; $(info $(M) building static executable for MacOS…) @ ## Build program binary
