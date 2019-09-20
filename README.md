@@ -56,7 +56,10 @@ Options:
 ### Binary
 
 ```bash
-curl - ...
+# YOLO
+curl -sL https://github.com/devops-works/influxevent/releases/download/v0.1/influxevent-amd64-v0.1.gz -o - | gunzip > influxevent
+chmod +x influxevent
+sudo mv influxevent /usr/local/bin/influxevent
 ```
 
 or if you have Go installed:
