@@ -1,5 +1,8 @@
 # Influxevent
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/devops-works/influxevent)](https://goreportcard.com/report/github.com/devops-works/influxevent)
+
 **this is alpha stuff - there aren't even tests :/**
 
 Influxevent wraps commands and sends command result & timing to an influxDB server.
@@ -24,7 +27,7 @@ Using in a cron job:
 0 1 * * * ./influxevent -timeout 300 -server https://influx.example.com:8086/ -db mydb -measurement events -retry 3 /usr/local/bin/database_backup >> /var/log/backups.log 2>&1
 ```
 
-then in fluxdb:
+then in influxdb:
 
 ```bash
 > select last(*) from events;
@@ -33,6 +36,12 @@ time last_duration last_status
 ---- ------------- -----------
 0    5.001956      0
 > 
+```
+
+Adding tags:
+
+```bash
+0 1 * * * ./influxevent -server https://influx.example.com:8086/ -db mydb -measurement events --tags program=database_backup,db=foodb /usr/local/bin/database_backup foodb >> /var/log/backups.log 2>&1
 ```
 
 ### Arguments
@@ -74,6 +83,10 @@ go install github.com/devops-works/influxevent
 make
 ```
 
+## Contributions
+
+Welcomed !
+
 ## Licence
 
-DWTFYWT Public Licence
+GPLv3
