@@ -26,27 +26,27 @@ static: fmt lint $(BIN) ; $(info $(M) building static executable for Linux……
 	$Q env GOOS=linux GOARCH=amd64 CGO_ENABLED=0 $(GO) build \
 		-tags release \
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
-		-o $(BIN)/$(PACKAGE)-linux-$(VERSION)
-	$Q gzip $(BIN)/$(PACKAGE)-linux-$(VERSION)
+		-o $(BIN)/$(PACKAGE)-amd64-$(VERSION)
 
 darwin: fmt lint $(BIN) ; $(info $(M) building static executable for MacOS…) @ ## Build program binary
 	$Q env GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 $(GO) build \
 		-tags release \
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
 		-o $(BIN)/$(PACKAGE)-darwin-$(VERSION)
-	$Q gzip $(BIN)/$(PACKAGE)-darwin-$(VERSION)
 
 windows: fmt lint $(BIN) ; $(info $(M) building static executable for Windoze…) @ ## Build program binary
 	$Q env GOOS=windows GOARCH=amd64 CGO_ENABLED=0 $(GO) build \
 		-tags release \
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
 		-o $(BIN)/$(PACKAGE)-win-$(VERSION)
-	$Q gzip $(BIN)/$(PACKAGE)-win-$(VERSION)
 
 release: windows darwin static ; $(info $(M) stripping release executable for Linux…) @ ## Build program binary
-	$Q strip $(BIN)/$(PACKAGE)
-	$Q cp $(BIN)/$(PACKAGE) $(BIN)/$(PACKAGE)-amd64
-	$Q $(BIN)/$(PACKAGE) --version
+	$Q strip $(BIN)/$(PACKAGE)-linux-$(VERSION)
+	$Q cp $(BIN)/$(PACKAGE)-amd64-$(VERSION) $(BIN)/$(PACKAGE)
+	$Q gzip $(BIN)/$(PACKAGE)-amd64-$(VERSION)
+	$Q gzip $(BIN)/$(PACKAGE)-darwin-$(VERSION)
+	$Q gzip $(BIN)/$(PACKAGE)-win-$(VERSION)
+	$Q $(BIN)/$(PACKAGE) -version
 
 # Tools
 
