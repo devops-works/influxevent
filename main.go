@@ -10,12 +10,11 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
-	"strings"
 	"syscall"
 	"time"
 )
 
-type InfluxServer struct {
+type influx struct {
 	db      string
 	url     string
 	user    string
@@ -23,15 +22,18 @@ type InfluxServer struct {
 	retries int
 }
 
-type InfluxPoint struct {
+type point struct {
 	measurement string
 	tags        string
 	duration    float64
 	status      int
 }
 
+// Version from git sha1/tags
+var Version string
+
 func main() {
-	var timeout = flag.Float64("timeout", 0, "command timeout (default: 0, no timeout")
+	var timeout = flag.Float64("timeout", 0, "command timeout (default: 0, no timeout)")
 	var influxServer = flag.String("server", "", "influxdb server URL (no events are send if not set)")
 	var influxDB = flag.String("db", "", "influxdb database (no events are send if not set)")
 	var influxUser = flag.String("user", "", "influxdb username (default: none)")
@@ -39,8 +41,20 @@ func main() {
 	var influxMeasurement = flag.String("measurement", "", "influxdb measurement (default: none, required when server is set)")
 	var influxTags = flag.String("tags", "", "comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')")
 	var influxRetry = flag.Int("retry", 3, "how many times we retry to send the event to influxdb(default: 3)")
+	var version = flag.Bool("version", false, "show version")
 
 	flag.Parse()
+
+	if *version {
+		fmt.Printf("%s v%s\n", os.Args[0], Version)
+		os.Exit(0)
+	}
+
+	if len(os.Args) == 1 {
+		log.Printf("error: no command specified\n")
+		flag.Usage()
+		os.Exit(1)
+	}
 
 	start := time.Now()
 	err := executeCommand(flag.Args(), *timeout)
@@ -73,7 +87,7 @@ func main() {
 		os.Exit(exitStatus)
 	}
 
-	inf := InfluxServer{
+	inf := influx{
 		db:      *influxDB,
 		url:     *influxServer,
 		user:    *influxUser,
@@ -81,7 +95,7 @@ func main() {
 		retries: *influxRetry,
 	}
 
-	pt := InfluxPoint{
+	pt := point{
 		measurement: *influxMeasurement,
 		tags:        *influxTags,
 		duration:    duration,
@@ -95,23 +109,29 @@ func main() {
 	}
 }
 
-func (p InfluxPoint) String() string {
+func (p point) String() string {
 	host, err := os.Hostname()
 	if err != nil {
 		host = "unknown"
 	}
 
 	influxString := fmt.Sprintf("%s,host=%s", p.measurement, host)
-	influxString = strings.Join([]string{influxString, p.tags}, ",")
+	if p.tags != "" {
+		influxString = fmt.Sprintf("%s,%s", influxString, p.tags)
+	}
 	influxString = fmt.Sprintf("%s duration=%f,status=%d", influxString, p.duration, p.status)
 	return influxString
 }
 
-func logInfluxDB(server InfluxServer, point InfluxPoint) error {
+func logInfluxDB(server influx, point point) error {
 	buf := bytes.NewBufferString(point.String())
-	// fmt.Printf("influxString: %s\n", influxString)
 
-	uri := fmt.Sprintf("%s/write?db=%s", server.url, server.db)
+	var uri string
+	if server.url[len(server.url)-1] == '/' {
+		uri = fmt.Sprintf("%swrite?db=%s", server.url, server.db)
+	} else {
+		uri = fmt.Sprintf("%s/write?db=%s", server.url, server.db)
+	}
 
 	// Dangerous; shoud use url encoding
 	if server.user != "" {
