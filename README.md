@@ -41,15 +41,15 @@ General invocation: `influxevent [options] cmd args...`
 
 Options:
 
-- -db: influxdb database (no events are send if not set)
-- -measurement: influxdb measurement (default: none, required when server is set)
-- -pass: influxdb password (default: none)
-- -retry: how many times we retry to send the event to influxdb(default: 3) (default 3)
-- -server: influxdb server URL (no events are send if not set)
-- -tags: comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')
-- -timeout: command timeout (default: 0, no timeout)
-- -user: influxdb username (default: none)
-- -version: shows version
+- `-db`: influxdb database (no events are send if not set)
+- `-measurement`: influxdb measurement (default: none, required when server is set)
+- `-pass`: influxdb password (default: none)
+- `-retry`: how many times we retry to send the event to influxdb(default: 3) (default 3)
+- `-server`: influxdb server URL (no events are send if not set)
+- `-tags`: comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')
+- `-timeout`: command timeout (default: 0, no timeout)
+- `-user`: influxdb username (default: none)
+- `-version`: shows version
 
 ## Installing
 
