@@ -78,6 +78,7 @@ func Test_logInfluxDB(t *testing.T) {
 				server: influx{
 					db:   "foodb",
 					user: "u", pass: "p",
+					retries: 1,
 				},
 				point: point{
 					measurement: "events",
@@ -127,7 +128,7 @@ func Test_executeCommand(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "ls tmp",
+			name: "sleep too long",
 			args: args{
 				args:    []string{"sleep", "0.1"},
 				timeout: 0.1},

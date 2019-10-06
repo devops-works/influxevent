@@ -42,7 +42,7 @@ func main() {
 	var influxPass = flag.String("pass", "", "influxdb password (default: none)")
 	var influxMeasurement = flag.String("measurement", "", "influxdb measurement (default: none, required when server is set)")
 	var influxTags = flag.String("tags", "", "comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')")
-	var influxRetry = flag.Int("retry", 3, "how many times we retry to send the event to influxdb (default: 3)")
+	var influxRetry = flag.Int("retry", 3, "how many times we try to send the event to influxdb (default: 3)")
 	var influxTimeout = flag.Int("influxtimeout", 2000, "how many milliseconds do we allow influxdb POST to take (default: 2000)")
 	var version = flag.Bool("version", false, "show version")
 
@@ -57,6 +57,10 @@ func main() {
 		log.Printf("error: no command specified\n")
 		flag.Usage()
 		os.Exit(1)
+	}
+
+	if *influxRetry <= 0 {
+		*influxRetry = 3
 	}
 
 	start := time.Now()
@@ -208,7 +212,7 @@ func executeCommand(args []string, timeout float64) error {
 
 	err = cmd.Start()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	log.Printf("Just ran subprocess %d\n", cmd.Process.Pid)
