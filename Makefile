@@ -42,7 +42,7 @@ windows: fmt lint clean $(BIN) ; $(info $(M) building static executable for Wind
 		-ldflags '-w -extldflags "-static" -X main.Version=$(VERSION) -X main.BuildDate=$(DATE)' -a \
 		-o $(BIN)/$(PACKAGE)-win-$(VERSION)
 
-release: windows darwin static ; $(info $(M) stripping release executable for Linux…) @ ## Build program binary
+release: windows darwin linux ; $(info $(M) stripping release executable for Linux…) @ ## Build program binary
 	$Q strip $(BIN)/$(PACKAGE)-amd64-$(VERSION)
 	$Q cp $(BIN)/$(PACKAGE)-amd64-$(VERSION) $(BIN)/$(PACKAGE)
 	$Q gzip $(BIN)/$(PACKAGE)-amd64-$(VERSION)
