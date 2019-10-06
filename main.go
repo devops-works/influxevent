@@ -21,6 +21,7 @@ type influx struct {
 	user    string
 	pass    string
 	retries int
+	timeout time.Duration
 }
 
 type point struct {
@@ -41,7 +42,8 @@ func main() {
 	var influxPass = flag.String("pass", "", "influxdb password (default: none)")
 	var influxMeasurement = flag.String("measurement", "", "influxdb measurement (default: none, required when server is set)")
 	var influxTags = flag.String("tags", "", "comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')")
-	var influxRetry = flag.Int("retry", 3, "how many times we retry to send the event to influxdb(default: 3)")
+	var influxRetry = flag.Int("retry", 3, "how many times we retry to send the event to influxdb (default: 3)")
+	var influxTimeout = flag.Int("influxtimeout", 2000, "how many milliseconds do we allow influxdb POST to take (default: 2000)")
 	var version = flag.Bool("version", false, "show version")
 
 	flag.Parse()
@@ -94,6 +96,7 @@ func main() {
 		user:    *influxUser,
 		pass:    *influxPass,
 		retries: *influxRetry,
+		timeout: time.Duration(*influxTimeout) * time.Millisecond,
 	}
 
 	pt := point{
@@ -139,7 +142,20 @@ func logInfluxDB(server influx, point point) error {
 		uri += fmt.Sprintf("&u=%s&p=%s", server.user, server.pass)
 	}
 
-	resp, err := http.Post(uri, "application/x-www-form-urlencoded", buf)
+	client := &http.Client{
+		Timeout: server.timeout,
+	}
+
+	var err error
+	var resp *http.Response
+
+	for try := 0; try < server.retries; try++ {
+		resp, err = client.Post(uri, "application/x-www-form-urlencoded", buf)
+		if err == nil {
+			break
+		}
+		fmt.Println(try)
+	}
 	if err != nil {
 		return err
 	}
@@ -190,5 +206,16 @@ func executeCommand(args []string, timeout float64) error {
 		}
 	}()
 
-	return cmd.Run()
+	err = cmd.Start()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Just ran subprocess %d\n", cmd.Process.Pid)
+
+	return cmd.Wait()
+}
+
+func watch(pid int) {
+	// see https://github.com/struCoder/pidusage/blob/master/pidusage.go
 }

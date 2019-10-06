@@ -44,7 +44,7 @@ time last_duration last_status
 Adding tags:
 
 ```bash
-0 1 * * * ./influxevent -server https://influx.example.com:8086/ -db mydb -measurement events --tags program=database_backup,db=foodb /usr/local/bin/database_backup foodb >> /var/log/backups.log 2>&1
+0 1 * * * ./bin/influxevent -server https://influx.example.com:8086/ -db mydb -measurement events --tags program=database_backup,db=foodb /usr/local/bin/database_backup foodb >> /var/log/backups.log 2>&1
 ```
 
 ### Arguments
@@ -60,6 +60,7 @@ Options:
 - `-server`: influxdb server URL (no events are send if not set)
 - `-tags`: comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')
 - `-timeout`: command timeout (default: 0, no timeout)
+- `-influxtimeout`: timeout writing to influxdb in ms (default: 2000)
 - `-user`: influxdb username (default: none)
 - `-version`: shows version
 
