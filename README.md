@@ -12,10 +12,10 @@ Influxevent wraps commands and sends command result & timing to an influxDB serv
 
 The influx entries contains the following values:
 
-- *command duration*
-- *command exit value*
-- *command cpu usage* for per sample period
-- *command memory usage* for per sample period
+- *command duration* (tag `etype=event`)
+- *command exit value* (tag `etype=event`)
+- *command cpu usage* for per sample period (tag `etype=metric`)
+- *command memory usage* for per sample period (tag `etype=metric`)
 
 When invoking `influxevent`, you can pass:
 
@@ -23,7 +23,7 @@ When invoking `influxevent`, you can pass:
 - a list of tag names and values (`tag1=val1,tag2=val2`); `host` tag is added
   automatically
 
-Influxevent transparently proxies commands's stdout/stderr and exit value.
+Influxevent transparently proxies command's stdout/stderr and exit value.
 
 ## Usage
 
