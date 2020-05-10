@@ -9,7 +9,7 @@ env:
     - CC_TEST_REPORTER_ID=5b83cb480af2b962400b3ccc8ffd43727e0f3937d638a4daaf1087431f582dda
 
 go:
-  - 1.12.x
+  - 1.14.x
 
 # addons:
 #   sonarcloud:
