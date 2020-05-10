@@ -2,26 +2,38 @@ package main
 
 import (
 	"bufio"
-	"bytes"
+	// "bytes"
 	"context"
-	"flag"
+	// "flag"
 	"fmt"
 	"log"
-	"net/http"
+
+	// "net/http"
 	"os"
 	"os/exec"
 	"strconv"
-	"syscall"
+
+	// "syscall"
 	"time"
+
+	"github.com/crgimenes/goconfig"
+	_ "github.com/crgimenes/goconfig/yaml"
 )
 
+type config struct {
+	Timeout float64 `yaml:"timeout" cfg:"timeout"`
+	Influx  influx  `yaml:"influxdb" cfg:"influxdb"`
+}
+
 type influx struct {
-	db      string
-	url     string
-	user    string
-	pass    string
-	retries int
-	timeout time.Duration
+	db          string
+	server      string
+	user        string
+	pass        string
+	measurement string
+	tags        []string
+	retries     int
+	timeout     time.Duration
 }
 
 type point struct {
@@ -34,87 +46,116 @@ type point struct {
 // Version from git sha1/tags
 var Version string
 
-func main() {
-	var timeout = flag.Float64("timeout", 0, "command timeout (default: 0, no timeout)")
-	var influxServer = flag.String("server", "", "influxdb server URL (no events are send if not set)")
-	var influxDB = flag.String("db", "", "influxdb database (no events are send if not set)")
-	var influxUser = flag.String("user", "", "influxdb username (default: none)")
-	var influxPass = flag.String("pass", "", "influxdb password (default: none)")
-	var influxMeasurement = flag.String("measurement", "", "influxdb measurement (default: none, required when server is set)")
-	var influxTags = flag.String("tags", "", "comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')")
-	var influxRetry = flag.Int("retry", 3, "how many times we try to send the event to influxdb (default: 3)")
-	var influxTimeout = flag.Int("influxtimeout", 2000, "how many milliseconds do we allow influxdb POST to take (default: 2000)")
-	var version = flag.Bool("version", false, "show version")
-
-	flag.Parse()
-
-	if *version {
-		fmt.Printf("%s %s\n", os.Args[0], Version)
-		os.Exit(0)
-	}
-
-	if len(os.Args) == 1 {
-		log.Printf("error: no command specified\n")
-		flag.Usage()
-		os.Exit(1)
-	}
-
-	if *influxRetry <= 0 {
-		*influxRetry = 3
-	}
-
-	start := time.Now()
-	err := executeCommand(flag.Args(), *timeout)
-	duration := time.Since(start).Seconds()
-
-	exitStatus := 0
-
-	if err != nil {
-		if exiterr, ok := err.(*exec.ExitError); ok {
-			// The program has exited with an exit code != 0
-
-			// This works on both Unix and Windows. Although package
-			// syscall is generally platform dependent, WaitStatus is
-			// defined for both Unix and Windows and in both cases has
-			// an ExitStatus() method with the same signature.
-			if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-				exitStatus = status.ExitStatus()
-			}
-		} else {
-			log.Fatalf("error running command: %v", err)
+func isInSlice(needle string, stack []string) bool {
+	for _, item := range stack {
+		if item == needle {
+			return true
 		}
 	}
 
-	if exitStatus == -1 {
-		log.Printf("command has been killed due to timeout")
-	}
+	return false
+}
 
-	if *influxServer == "" || *influxDB == "" {
-		log.Printf("not writing point to influx since database or url is not set (%d)", exitStatus)
-		os.Exit(exitStatus)
-	}
+func main() {
+	// var timeout = flag.Float64("timeout", 0, "command timeout (default: 0, no timeout)")
+	// var influxServer = flag.String("server", "", "influxdb server URL (no events are send if not set)")
+	// var influxDB = flag.String("db", "", "influxdb database (no events are send if not set)")
+	// var influxUser = flag.String("user", "", "influxdb username (default: none)")
+	// var influxPass = flag.String("pass", "", "influxdb password (default: none)")
+	// var influxMeasurement = flag.String("measurement", "", "influxdb measurement (default: none, required when server is set)")
+	// var influxTags = flag.String("tags", "", "comma-separated k=v pairs of influxdb tags (default: none, example: 'foo=bar,fizz=buzz')")
+	// var influxRetry = flag.Int("retry", 3, "how many times we try to send the event to influxdb (default: 3)")
+	// var influxTimeout = flag.Int("influxtimeout", 2000, "how many milliseconds do we allow influxdb POST to take (default: 2000)")
+	// var version = flag.Bool("version", false, "show version")
 
-	inf := influx{
-		db:      *influxDB,
-		url:     *influxServer,
-		user:    *influxUser,
-		pass:    *influxPass,
-		retries: *influxRetry,
-		timeout: time.Duration(*influxTimeout) * time.Millisecond,
-	}
+	// flag.Parse()
 
-	pt := point{
-		measurement: *influxMeasurement,
-		tags:        *influxTags,
-		duration:    duration,
-		status:      exitStatus,
+	if isInSlice("-version", os.Args) {
+		fmt.Printf("%s %s\n", os.Args[0], Version)
+		os.Exit(0)
 	}
+	cfg := config{}
 
-	err = logInfluxDB(inf, pt)
+	// step 3: Pass the instance pointer to the parser
+	err := goconfig.Parse(&cfg)
 	if err != nil {
-		log.Printf("unable to write to influxdb: %v", err)
+		println(err)
+		return
+	}
+
+	fmt.Printf("CONFIG: %+v\n", cfg)
+
+	// if *version {
+	// 	fmt.Printf("%s %s\n", os.Args[0], Version)
+	// 	os.Exit(0)
+	// }
+
+	fmt.Printf("ARGS: %+v\n", os.Args)
+
+	if len(os.Args) == 1 {
+		log.Printf("error: no command specified\n")
+		// flag.Usage()
 		os.Exit(1)
 	}
+
+	if cfg.Influx.retries <= 0 {
+		cfg.Influx.retries = 3
+	}
+
+	/*
+		start := time.Now()
+		err := executeCommand(flag.Args(), cfg.timeout)
+		duration := time.Since(start).Seconds()
+
+		exitStatus := 0
+
+		if err != nil {
+			if exiterr, ok := err.(*exec.ExitError); ok {
+				// The program has exited with an exit code != 0
+
+				// This works on both Unix and Windows. Although package
+				// syscall is generally platform dependent, WaitStatus is
+				// defined for both Unix and Windows and in both cases has
+				// an ExitStatus() method with the same signature.
+				if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+					exitStatus = status.ExitStatus()
+				}
+			} else {
+				log.Fatalf("error running command: %v", err)
+			}
+		}
+
+		if exitStatus == -1 {
+			log.Printf("command has been killed due to timeout")
+		}
+
+		if *influxServer == "" || *influxDB == "" {
+			log.Printf("not writing point to influx since database or url is not set (%d)", exitStatus)
+			os.Exit(exitStatus)
+		}
+
+		inf := influx{
+			db:      *influxDB,
+			url:     *influxServer,
+			user:    *influxUser,
+			pass:    *influxPass,
+			retries: *influxRetry,
+			timeout: time.Duration(*influxTimeout) * time.Millisecond,
+		}
+
+		pt := point{
+			measurement: *influxMeasurement,
+			tags:        *influxTags,
+			duration:    duration,
+			status:      exitStatus,
+		}
+
+		err = logInfluxDB(inf, pt)
+		if err != nil {
+			log.Printf("unable to write to influxdb: %v", err)
+			os.Exit(1)
+		}
+	*/
 }
 
 func (p point) String() string {
@@ -131,6 +172,7 @@ func (p point) String() string {
 	return influxString
 }
 
+/*
 func logInfluxDB(server influx, point point) error {
 	buf := bytes.NewBufferString(point.String())
 
@@ -169,6 +211,7 @@ func logInfluxDB(server influx, point point) error {
 	}
 	return nil
 }
+*/
 
 func executeCommand(args []string, timeout float64) error {
 	var cmd *exec.Cmd
