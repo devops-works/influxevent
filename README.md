@@ -99,7 +99,7 @@ PERIOD=100
 
 ```bash
 # YOLO
-curl -sL https://github.com/devops-works/influxevent/releases/download/v0.4/influxevent-amd64-v0.4.gz -o - | gunzip > influxevent
+curl -sL https://github.com/devops-works/influxevent/releases/download/v0.5/influxevent-amd64-v0.5.gz -o - | gunzip > influxevent
 chmod +x influxevent
 sudo mv influxevent /usr/local/bin/influxevent
 ```
