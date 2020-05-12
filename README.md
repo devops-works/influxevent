@@ -1,14 +1,8 @@
 # Influxevent
 
-PROJECT HAS MOVED TO https://gitlab.com/devopsworks/tools/influxevent
+**PROJECT HAS MOVED TO**
 
-[![Build Status](https://travis-ci.org/devops-works/influxevent.svg?branch=master)](https://travis-ci.org/devops-works/influxevent)
-[![Go Report Card](https://goreportcard.com/badge/github.com/devops-works/influxevent)](https://goreportcard.com/report/github.com/devops-works/influxevent)
-[![Maintainability](https://api.codeclimate.com/v1/badges/c4371a3fb883f200ccef/maintainability)](https://codeclimate.com/github/devops-works/influxevent/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/c4371a3fb883f200ccef/test_coverage)](https://codeclimate.com/github/devops-works/influxevent/test_coverage)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
-**this is beta stuff**
+https://gitlab.com/devopsworks/tools/influxevent
 
 Influxevent wraps commands and sends command result & timing to an influxDB server.
 
