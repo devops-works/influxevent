@@ -1,5 +1,7 @@
 # Influxevent
 
+PROJECT HAS MOVED TO https://gitlab.com/devopsworks/tools/influxevent
+
 [![Build Status](https://travis-ci.org/devops-works/influxevent.svg?branch=master)](https://travis-ci.org/devops-works/influxevent)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devops-works/influxevent)](https://goreportcard.com/report/github.com/devops-works/influxevent)
 [![Maintainability](https://api.codeclimate.com/v1/badges/c4371a3fb883f200ccef/maintainability)](https://codeclimate.com/github/devops-works/influxevent/maintainability)
